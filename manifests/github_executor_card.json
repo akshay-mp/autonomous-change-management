@@ -1,0 +1,18 @@
+{
+    "name": "GitHubExecutor",
+    "description": "Interacts with GitHub to list or create issues.",
+    "capabilities": [
+        "list_github_issues",
+        "create_github_issues"
+    ],
+    "inputs": {
+        "action": "string (enum: list_issues, create_issues)",
+        "repo_owner": "string (optional)",
+        "repo_name": "string (optional)",
+        "impact_analysis": "list (required for create_issues)"
+    },
+    "outputs": {
+        "existing_issues": "list",
+        "created_issues": "list"
+    }
+}

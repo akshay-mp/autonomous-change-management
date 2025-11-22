@@ -1,0 +1,13 @@
+{
+    "name": "JiraCollector",
+    "description": "Fetches Jira tickets that need attention.",
+    "capabilities": [
+        "fetch_jira_tickets"
+    ],
+    "inputs": {
+        "jira_status": "string (optional)"
+    },
+    "outputs": {
+        "tickets": "list"
+    }
+}

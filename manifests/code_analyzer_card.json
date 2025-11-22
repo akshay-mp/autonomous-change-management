@@ -1,0 +1,15 @@
+{
+    "name": "CodeAnalyzer",
+    "description": "Analyzes the codebase to find impact of changes.",
+    "capabilities": [
+        "analyze_code_impact"
+    ],
+    "inputs": {
+        "tickets": "list",
+        "repo_owner": "string (optional)",
+        "repo_name": "string (optional)"
+    },
+    "outputs": {
+        "impact_analysis": "list"
+    }
+}
