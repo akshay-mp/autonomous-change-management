@@ -6,7 +6,7 @@ from google.adk import Agent
 
 # Import agents
 from agents.jira_collector import JiraCollector
-from agents.code_analyzer import CodeAnalyzer
+from agents.design_analyzer import DesignAnalyzer
 from agents.github_executor import GitHubExecutor
 
 # Configure Gemini
@@ -24,7 +24,7 @@ class AgentRegistry:
         # Instantiate agents
         # In a real system, this could be dynamic import based on manifest
         self.agents["JiraCollector"] = JiraCollector()
-        self.agents["CodeAnalyzer"] = CodeAnalyzer()
+        self.agents["DesignAnalyzer"] = DesignAnalyzer()
         self.agents["GitHubExecutor"] = GitHubExecutor()
 
         # Load manifests
@@ -70,7 +70,7 @@ class ChangeManagementOrchestrator(Agent):
         print(f"[{self.name}] Discovered capabilities: {capabilities}")
 
         # 2. Planning
-        goal = "Fetch Jira tickets, check against existing GitHub issues to avoid duplicates, analyze impact for new tickets, and create GitHub issues."
+        goal = "Fetch Jira tickets, check against existing GitHub issues to avoid duplicates, analyze design impact for new tickets, and create GitHub issues."
         
         # Load memory
         memory = self._load_memory(memory_file)
@@ -103,6 +103,12 @@ class ChangeManagementOrchestrator(Agent):
                     context["action"] = "list_issues"
                 elif "create" in capability:
                     context["action"] = "create_issues"
+                    # Map design_analysis to impact_analysis for backward compatibility if needed, 
+                    # or update GitHubExecutor to handle design_analysis.
+                    # For now, let's assume GitHubExecutor expects 'impact_analysis' key, 
+                    # so we might need to map it if DesignAnalyzer returns 'design_analysis'.
+                    if "design_analysis" in context:
+                        context["impact_analysis"] = context["design_analysis"]
 
             try:
                 # Execute
@@ -199,7 +205,7 @@ class ChangeManagementOrchestrator(Agent):
             return [
                 {"agent": "JiraCollector", "capability": "fetch_jira_tickets", "reasoning": "Get new work"},
                 {"agent": "GitHubExecutor", "capability": "list_github_issues", "reasoning": "Check existing work"},
-                {"agent": "CodeAnalyzer", "capability": "analyze_code_impact", "reasoning": "Analyze impact"},
+                {"agent": "DesignAnalyzer", "capability": "analyze_design_impact", "reasoning": "Analyze design"},
                 {"agent": "GitHubExecutor", "capability": "create_github_issues", "reasoning": "Create tasks"}
             ]
 

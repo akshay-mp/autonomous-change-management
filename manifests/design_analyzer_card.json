@@ -1,8 +1,8 @@
 {
-    "name": "CodeAnalyzer",
-    "description": "Analyzes the codebase to find impact of changes.",
+    "name": "DesignAnalyzer",
+    "description": "Analyzes the current design and identifies component changes.",
     "capabilities": [
-        "analyze_code_impact"
+        "analyze_design_impact"
     ],
     "inputs": {
         "tickets": "list",
@@ -10,6 +10,6 @@
         "repo_name": "string (optional)"
     },
     "outputs": {
-        "impact_analysis": "list"
+        "design_analysis": "list"
     }
 }

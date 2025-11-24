@@ -1,14 +1,19 @@
 # Autonomous Change Management Assistant
 
-An intelligent, multi-agent system designed to automate the software change management process. It orchestrates specialized agents to fetch Jira tickets, analyze their impact on a GitHub codebase, and automatically create or update GitHub issues with detailed implementation plans.
+An intelligent, multi-agent system designed to automate the software change management process. It orchestrates specialized agents to fetch Jira tickets, analyze their **design impact** on a GitHub codebase, and automatically create or update GitHub issues with detailed implementation plans.
 
 ## 🚀 Features
 
 -   **Multi-Agent Architecture**: Built using **Google Agent Development Kit (ADK)**.
     -   **JiraCollector**: Fetches "To Do" and "In Progress" tickets from Jira.
-    -   **CodeAnalyzer**: Uses **Gemini 2.5 Flash** to analyze code impact on the `akshay-mp/simple_production_rag` repository.
+    -   **DesignAnalyzer**: Uses **Gemini 2.5 Flash** to analyze the design impact on the repository.
+        -   **Advanced Discovery**: Automatically explores the repo structure, finding design docs in `docs/` or root (e.g., `.md`, `.puml`).
+        -   **Smart Context**: Uses an LLM to select the most relevant design files for context before analysis.
     -   **GitHubExecutor**: Manages GitHub issues (Listing & Creating).
 -   **A2A Protocol Integration**: Implements **Agent Cards** for dynamic capability discovery and orchestration.
+-   **Feedback & Learning**:
+    -   **Memory**: Maintains a history of execution plans and outcomes in `orchestrator_memory.json`.
+    -   **Adaptive Planning**: Uses past successful plans to inform and improve future orchestration.
 -   **Smart Optimization**:
     -   **Duplicate Detection**: Checks existing GitHub issues before analyzing to prevent duplicates.
     -   **Cost Efficient**: Only analyzes new, unprocessed tickets.
@@ -68,7 +73,11 @@ graph TD
         Orchestrator -->|Discovery| Registry[Agent Registry]
         Registry -->|Capabilities| JC[JiraCollector]
         Registry -->|Capabilities| GE[GitHubExecutor]
-        Registry -->|Capabilities| CA[CodeAnalyzer]
+        Registry -->|Capabilities| DA[DesignAnalyzer]
+    end
+    
+    subgraph "Learning System"
+        Orchestrator <-->|Read/Write| Memory[(Memory JSON)]
     end
     
     Orchestrator -->|1. Fetch Tickets| JC
@@ -79,13 +88,13 @@ graph TD
     
     Orchestrator -->|3. Filter Duplicates| Logic{Optimization}
     
-    Logic -->|New Tickets| CA
+    Logic -->|New Tickets| DA
     Logic -->|Duplicates| Skip[Skip]
     
-    CA -->|4. Analyze Impact| Gemini[Gemini 2.5 Flash]
-    Gemini -->|Context| GitHub
+    DA -->|4. Discovery & Analysis| Gemini[Gemini 2.5 Flash]
+    Gemini -->|Read Docs/Design| GitHub
     
-    CA -->|5. Create Issues| GE
+    DA -->|5. Create Issues| GE
 ```
 
 ## 🤝 Contributing

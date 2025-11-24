@@ -16,8 +16,12 @@ async def main():
     tickets = context.get("tickets", [])
     print(f"Tickets Found: {len(tickets)}")
     
-    impacts = context.get("impact_analysis", [])
-    print(f"Impact Analysis Items: {len(impacts)}")
+    # Check for design analysis
+    impacts = context.get("design_analysis", [])
+    if not impacts:
+        impacts = context.get("impact_analysis", [])
+        
+    print(f"Design/Impact Analysis Items: {len(impacts)}")
     
     issues = context.get("created_issues", [])
     print(f"Issues Created: {len(issues)}")
