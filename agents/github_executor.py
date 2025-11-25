@@ -16,10 +16,10 @@ class GitHubExecutor(Agent):
         
         # Connect to GitHub MCP
         env = os.environ.copy()
-        token = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
-        if token:
-            env["GITHUB_PERSONAL_ACCESS_TOKEN"] = token
-            
+        # Ensure GitHub PAT is passed to the MCP server
+        if "GITHUB_PERSONAL_ACCESS_TOKEN" not in env:
+             print(f"[{self.name}] Warning: GITHUB_PERSONAL_ACCESS_TOKEN not found in environment.")
+
         server_params = StdioServerParameters(
             command="npx",
             args=["-y", "@modelcontextprotocol/server-github"],
