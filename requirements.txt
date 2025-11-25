@@ -4,3 +4,4 @@ gradio==6.0.0
 python-dotenv
 google-adk
 dotenv
+aiohttp
