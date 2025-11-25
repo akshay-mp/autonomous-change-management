@@ -54,7 +54,7 @@ class ChangeManagementOrchestrator(Agent):
         super().__init__(name=name)
 
     async def run(self, context={}):
-        memory_file = "orchestrator_memory.json"
+        memory_file = os.path.join("data", "orchestrator_memory.json")
         print(f"[{self.name}] Starting A2A dynamic orchestration...")
         
         # Initialize components here to avoid Pydantic field issues

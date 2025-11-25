@@ -45,7 +45,7 @@ async def run_analysis():
         traceback.print_exc()
         yield gr.update(value=f"Error: {e}\n\nTraceback:\n{traceback.format_exc()}", visible=True)
 
-with gr.Blocks(theme=gr.themes.Soft(), title="Autonomous Change Management") as demo:
+with gr.Blocks(title="Autonomous Change Management") as demo:
     gr.Markdown(
         """
         # 🤖 Autonomous Change Management Assistant
@@ -61,4 +61,4 @@ with gr.Blocks(theme=gr.themes.Soft(), title="Autonomous Change Management") as 
     start_btn.click(run_analysis, [], [output_display])
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(theme=gr.themes.Soft())
