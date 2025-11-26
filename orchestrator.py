@@ -53,9 +53,11 @@ class ChangeManagementOrchestrator(Agent):
     def __init__(self, name="ChangeManagementOrchestrator"):
         super().__init__(name=name)
 
-    async def run(self, context={}):
+    async def run_with_progress(self, context={}):
         memory_file = os.path.join("data", "orchestrator_memory.json")
-        print(f"[{self.name}] Starting A2A dynamic orchestration...")
+        msg = f"[{self.name}] Starting A2A dynamic orchestration..."
+        print(msg)
+        yield f"[✓] {msg}"
         
         # Initialize components here to avoid Pydantic field issues
         registry = AgentRegistry()
@@ -68,6 +70,7 @@ class ChangeManagementOrchestrator(Agent):
             capabilities.extend(m.get("capabilities", []))
         
         print(f"[{self.name}] Discovered capabilities: {capabilities}")
+        yield f"[✓] Discovered {len(capabilities)} capabilities across {len(manifests)} agents."
 
         # 2. Planning
         goal = "Fetch Jira tickets, check against existing GitHub issues to avoid duplicates, analyze design impact for new tickets, and create GitHub issues."
@@ -77,6 +80,7 @@ class ChangeManagementOrchestrator(Agent):
         
         plan = self._generate_plan(goal, manifests, model, memory)
         print(f"[{self.name}] Generated Plan: {json.dumps(plan, indent=2)}")
+        yield f"[✓] Generated execution plan with {len(plan)} steps."
 
         # 3. Execution
         execution_log = []
@@ -87,7 +91,10 @@ class ChangeManagementOrchestrator(Agent):
             capability = step.get("capability")
             reasoning = step.get("reasoning")
             
-            print(f"[{self.name}] Executing Step: {capability} ({reasoning})")
+            msg = f"[{self.name}] Executing Step: {capability} ({reasoning})"
+            print(msg)
+            yield f"[✓] {capability}..."
+            yield f"    > {reasoning}"
             
             agent = registry.get_agent(agent_name)
             if not agent:
@@ -115,20 +122,23 @@ class ChangeManagementOrchestrator(Agent):
                 result = await agent.run(context)
                 context.update(result)
                 execution_log.append({"step": step, "status": "success"})
+                yield f"    > Success"
 
                 # Post-processing for optimization (Duplicate Filtering)
                 if capability == "list_github_issues" and "tickets" in context:
                     self._filter_duplicates(context)
+                    yield f"    > Filtered duplicates. {len(context.get('tickets', []))} new tickets remain."
             except Exception as e:
                 print(f"[{self.name}] Step failed: {e}")
                 success = False
                 execution_log.append({"step": step, "status": "failed", "error": str(e)})
+                yield f"    > Failed: {e}"
 
         # Save memory
         self._save_memory(memory_file, goal, plan, success, execution_log)
 
         print(f"[{self.name}] Orchestration complete.")
-        return context
+        yield context
 
     def _load_memory(self, memory_file):
         if os.path.exists(memory_file):
